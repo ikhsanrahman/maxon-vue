@@ -24,7 +24,7 @@
      <el-pagination
         background
         layout="prev, pager, next"
-        @current-change="load_items"
+        @current-change="load_items_page"
         :total="1000">
      </el-pagination>
     </el-dialog>

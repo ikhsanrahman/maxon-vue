@@ -148,7 +148,13 @@
       onSubmit() {
         const formData = new FormData()
         Object.keys(this.form).forEach((key) => {
+          if(key=="sales_date"){
+            formData.append(key, formatDate(this.form[key]))
+
+          } else {
             formData.append(key, this.form[key])
+
+          }
         })
         formData.append("mode",this.mode);
 

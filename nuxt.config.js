@@ -13,6 +13,9 @@ export default {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+    ],
+    script: [
+      { src: '/mylib.js'}
     ]
   },
   /*
@@ -29,7 +32,8 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/element-ui'
+    '@/plugins/element-ui' 
+
   ],
   /*
   ** Nuxt.js dev-modules
@@ -70,4 +74,5 @@ export default {
     extend (config, ctx) {
     }
   }
+
 }

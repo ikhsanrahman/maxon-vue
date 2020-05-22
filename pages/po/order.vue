@@ -153,19 +153,26 @@
           .catch(_ => {});
       },
       loadData(){
+        this.message="Loading..."
         var vUrl='/api/purchase_order/browse_data/'+this.page+"?sid_date_from="+this.date1+"&sid_date_to="+this.date2;
         axios.get(vUrl)
             .then((Response) => {
                 this.tableData = Response.data.rows;
+                this.message="Ready."
             })
             .catch((err) => {
                 console.log("Error")
             })
       },
       onSubmit() {
+        this.message="Saving..."
         const formData = new FormData()
         Object.keys(this.form).forEach((key) => {
+          if(key=="po_date"){
+            formData.append(key, formatDate(this.form[key]))
+          } else {
             formData.append(key, this.form[key])
+          }
         })
         formData.append("mode",this.mode);
 
@@ -175,7 +182,7 @@
             .then((Response) => {
                 if(Response.data.success){
                   this.dialogVisible=false;
-                  this.message="Success";
+                  this.message="Success.";
                   this.form.purchase_order_number=Response.data.purchase_order_number;
                   vUrl="/po/view/"+Response.data.purchase_order_number;
                   window.open(vUrl,"_self");
@@ -184,7 +191,7 @@
                 }
             })
             .catch((err) => {
-                this.message='Error'
+                this.message='Error '+err
             })
         },
         handleSizeChange(val) {
@@ -197,14 +204,16 @@
           this.loadData();
         },
         SupplierListLoad(){
-        var vUrl='/api/supplier/browse_data/1/1000';
-        axios.get(vUrl)
-            .then((Response) => {
-                this.SupplierList = Response.data.rows;
-            })
-            .catch((err) => {
-                console.log("Error")
-        })
+          this.message="Loading supplier..."
+          var vUrl='/api/supplier/browse_data/1/1000';
+          axios.get(vUrl)
+              .then((Response) => {
+                  this.SupplierList = Response.data.rows;
+                  this.message='Ready.'
+              })
+              .catch((err) => {
+                  console.log("Error")
+          })
       },
 
     },

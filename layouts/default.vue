@@ -16,7 +16,8 @@
         </el-header>
 
         <el-row>
-            <el-col :span="24" style="padding-left:20px">
+            <el-col :span="24" style="padding-left:20px;background: white;
+    border: 1px solid gray;">
               <nuxt />
             </el-col>
         </el-row>

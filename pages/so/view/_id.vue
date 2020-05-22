@@ -173,7 +173,7 @@
       saveDoc() {
         const formData = new FormData()
         Object.keys(this.form).forEach((key) => {
-            formData.append(key, this.form[key])
+           formData.append(key, this.form[key])
         })
         formData.append("mode",this.mode);
 
@@ -295,6 +295,7 @@
       },
     },
   }
+
 
 </script>
 <style>

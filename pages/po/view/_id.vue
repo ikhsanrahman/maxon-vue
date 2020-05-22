@@ -46,12 +46,12 @@
         <el-table-column v-for="col in columns"  :label="col.label" :prop="col.field" 
             v-bind:key="col"  v-model="tableColumn">
         </el-table-column>
-        <el-table-column>
+        <el-table-column width="65">
           <template slot-scope="scope">
             <el-button @click.native.prevent="editRow(scope.$index, scope.row)" size="mini" type="primary" >Edit</el-button>
           </template>
         </el-table-column>
-        <el-table-column>
+        <el-table-column width="65">
           <template slot-scope="scope">
             <el-button @click="deleteRow(scope.$index, scope.row)"  size="mini"  type="danger" >Del</el-button>
           </template>
@@ -60,12 +60,13 @@
       </el-table>
     </el-row>
 
-    <DialogItem ref="dlgItemInput"></DialogItem>
+    <DialogItem ref="dlgItemInput" :afterSubmit="this.loadItems"></DialogItem>
 
   </div>
 </template>
 
 <script>
+
   import axios from 'axios'
   import DialogItem from "~/components/DialogItem.vue";
 
@@ -110,7 +111,13 @@
       saveDoc() {
         const formData = new FormData()
         Object.keys(this.form).forEach((key) => {
+            if(key=="po_date"){
+            formData.append(key, formatDate(this.form[key]))
+
+            } else {
             formData.append(key, this.form[key])
+
+            }
         })
         formData.append("mode",this.mode);
 
@@ -183,9 +190,18 @@
           })        
       },
       addRow:function(){
-        this.dialogVisible=true;
         var dlg = this.$refs.dlgItemInput
         dlg.nomor_bukti=this.form.purchase_order_number
+        dlg.item.item_number=""
+        dlg.item.description=""
+        dlg.item.quantity=""
+        dlg.item.unit=""
+        dlg.item.price=""
+        dlg.item.discount=""
+        dlg.item.total_price=""
+        dlg.item.line_number=""
+
+        this.dialogVisible=true;
         dlg.showDialog()
         
       },
@@ -195,10 +211,18 @@
         ++ this.addCount;
       },
       editRow(index,row){
-        this.dialogVisible=true
         var dlg = this.$refs.dlgItemInput
         dlg.nomor_bukti=this.form.purchase_order_number
-        dlg.item_number=row.item_number
+        dlg.item.item_number=row.item_number
+        dlg.item.description=row.description
+        dlg.item.quantity=row.quantity
+        dlg.item.unit=row.unit
+        dlg.item.price=row.price 
+        dlg.item.discount=row.discount
+        dlg.item.total_price=row.total_price
+        dlg.item.line_number=row.line_number
+
+        this.dialogVisible=true
         dlg.showDialog()
 
       },
@@ -230,7 +254,7 @@
           })
       },
       deleteRow(index, row) {
-        this.$confirm('Are you sure delete this supplier ?')
+        this.$confirm('Are you sure ?')
           .then(_ => {
           var vUrl='/api/purchase_order/delete_item/'+this.tableData[index].line_number;
           axios.get(vUrl)
@@ -278,6 +302,7 @@
 
     },
   }
+
 
 </script>
 <style>

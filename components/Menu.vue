@@ -8,10 +8,9 @@
       :collapse="isCollapse"
       ref="menu"
       active-text-color="#ffd04b">
-      <div style="background:white;margin:10px">
-        <img src='@/assets/logo_maxon.png' width="96%" height="100"/>
+      <div style="background:white;margin:10px;text-align:center">
+        <img src='@/assets/logo_maxon.png' width="90%" height="80"/>
       </div>
-      <el-button type="primary" @click="onCollapse" size="mini" ><span class='el-icon-back'></span></el-button>
       <el-menu-item index="2">
         <i class="el-icon-menu"></i>
         <el-link href="/" target="_self"> Dashboard</el-link>

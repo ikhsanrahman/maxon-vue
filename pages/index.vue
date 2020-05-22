@@ -1,7 +1,7 @@
 <template>
     <el-main>
       <el-row>
-        <h1>DASHBOARD</h1>
+        <h1>DASHBOARD</h1>        
         <i style='color:red'>{{message}}</i>
         <el-divider></el-divider>
 
@@ -48,10 +48,14 @@
 <script>
   import echarts from 'echarts'
   import axios from 'axios'
+  import DialogItem from "@/components/DialogItem.vue";
 
   export default {
     head: {
       title: 'Dashboard'
+    },
+    components: {
+      DialogItem
     },
     data() {
 
@@ -233,6 +237,6 @@
   margin:10px;
 }
 .text-head {
-  font-size: 60px;
+  font-size: x-large;
 }
 </style>

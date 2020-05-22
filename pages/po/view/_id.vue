@@ -34,7 +34,7 @@
               <el-input v-model="form.comments" type="textarea"></el-input>
             </el-form-item>
           </el-col>
-      </el-form>    
+      </el-form>         
       </el-col>
     </el-row>
     <el-row>
@@ -43,82 +43,35 @@
       <el-button @click="loadItems()" size="mini" type="success" ><span class='el-icon-refresh-left'> Refresh</span></el-button>
       <el-divider></el-divider>
       <el-table style="width: 100%" :data="tableData">
-        <el-table-column label="Kode Barang" prop="item_number">
-              <template slot-scope="scope" >
-                  <el-input size="small" style="text-align:center"  v-model="scope.row.item_number"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Nama Barang" prop="description">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:center"  v-model="scope.row.description"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Quantity" prop="quantity" width="100px">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:center"  v-model="scope.row.quantity"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Satuan" prop="unit" width="100px">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:center"  v-model="scope.row.unit"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Harga" prop="price" width="120px">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:right"  v-model="scope.row.price"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Jumlah" prop="total_price" width="120px">
-              <template slot-scope="scope" style="text-align:right" >
-                <el-input size="small" style="text-align:right"  v-model="scope.row.total_price"  />
-              </template>
+        <el-table-column v-for="col in columns"  :label="col.label" :prop="col.field" 
+            v-bind:key="col"  v-model="tableColumn">
         </el-table-column>
         <el-table-column>
           <template slot-scope="scope">
-            <el-button @click.native.prevent="saveRow(scope.$index, scope.row)" size="mini" type="primary" >Save</el-button>
-            <el-button @click="deleteRow(scope.$index, scope.row)"  size="mini"  type="danger" >Delete</el-button>
+            <el-button @click.native.prevent="editRow(scope.$index, scope.row)" size="mini" type="primary" >Edit</el-button>
           </template>
         </el-table-column>
+        <el-table-column>
+          <template slot-scope="scope">
+            <el-button @click="deleteRow(scope.$index, scope.row)"  size="mini"  type="danger" >Del</el-button>
+          </template>
+        </el-table-column>
+
       </el-table>
     </el-row>
-    <el-dialog title="Line Items"  :visible.sync="dialogVisible"
-      width="60%" :before-close="handleClose">
-      <el-divider></el-divider>
-      <el-form ref="form" :model="form" label-width="120px">
-          <el-form-item label="Item Number">
-              <el-input v-model="form_item.item_number"></el-input>
-          </el-form-item>
-          <el-form-item label="Description">
-              <el-input v-model="form_item.description"></el-input>
-          </el-form-item>                  
-          <el-form-item label="Quantity">
-              <el-input v-model="form_item.quantity"></el-input>
-          </el-form-item>
-          <el-form-item label="Unit">
-              <el-input v-model="form_item.unit"></el-input>
-          </el-form-item>
-          <el-form-item label="Price">
-              <el-input v-model="form_item.price"></el-input>
-          </el-form-item>
-          <el-form-item label="Discount%">
-              <el-input v-model="form_item.discount"></el-input>
-          </el-form-item>
-          <el-form-item label="Amount">
-              <el-input v-model="form_item.total_price"></el-input>
-          </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="onSubmit">Confirm</el-button>
-      </span>
-    </el-dialog>
+
+    <DialogItem ref="dlgItemInput"></DialogItem>
+
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+  import DialogItem from "~/components/DialogItem.vue";
+
   export default {
     components: {
+      DialogItem
     },
     head: {
       title: 'Sales Order View'
@@ -126,7 +79,6 @@
     data(){
       return {
         message:'',
-        dialogVisible:false,
         tableData: [{item_number: 'Loading...'}],
         form: {
           purchase_order_number: this.$route.params.id,
@@ -134,16 +86,6 @@
           po_date: new Date(),
           terms: 'KREDIT',
           comments: '',
-        },
-        form_item: {
-          item_number:'',
-          description:'',
-          quantity:'',
-          unit:'',
-          price:'',
-          discount:'',
-          total_price:'',
-          line_number:'',
         },
         columns: [
           {label: "Item Number", field:"item_number"},
@@ -153,9 +95,10 @@
           {label: "Price", field:"price"},
           {label: "Disc%", field:"discount"},
           {label: "Jumlah", field:"total_price"},
-          {label: "Line", field:"line_number"},
         ],
         addCount: 0,
+        listItems: [],
+        item_search: '',
 
       }  
     },
@@ -240,9 +183,24 @@
           })        
       },
       addRow:function(){
+        this.dialogVisible=true;
+        var dlg = this.$refs.dlgItemInput
+        dlg.nomor_bukti=this.form.purchase_order_number
+        dlg.showDialog()
+        
+      },
+      addRowLine:function(){
         let newRow  = {label:"",prop:""};
         this.tableData = [newRow,...this.tableData];
         ++ this.addCount;
+      },
+      editRow(index,row){
+        this.dialogVisible=true
+        var dlg = this.$refs.dlgItemInput
+        dlg.nomor_bukti=this.form.purchase_order_number
+        dlg.item_number=row.item_number
+        dlg.showDialog()
+
       },
       saveRow(index, rows) { 
         var vUrl='/api/purchase_order/save_item';
@@ -286,6 +244,38 @@
         })
         .catch(_ => {});
       },
+      querySearchItem(queryString, cb) {
+        this.item_search=queryString 
+        var links = this.listItems;
+        var results = queryString ? links.filter(this.createFilter(queryString)) : links;
+        // call callback function to return suggestions
+        cb(results);
+      },
+      createFilter(queryString) {
+        return (link) => {
+          return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        };
+      },
+      loadItemPilih() {
+        var vUrl='/api/inventory/browse_data/?tb_search='+this.item_search;
+        axios.get(vUrl)
+          .then((Response) => {
+              this.message=Response.data.msg;
+              var rows=Response.data.rows;
+              for(var i=0;i<rows.length;i++){
+                this.listItems.push({"value":rows[i].description,"link":rows[i].item_number});
+              }
+              console.log(this.listItems)
+          })
+          .catch((err) => {
+              this.message=err;
+          })
+
+      },
+      handleSelectItem(item) {
+        console.log(item);
+      }
+
     },
   }
 

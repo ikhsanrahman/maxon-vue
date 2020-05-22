@@ -9,7 +9,6 @@
     <el-input v-model="search" size="mini" placeholder="Type to search" style="width:200px" />
     <el-button size="mini" type="success" @click="handleRefresh()"><span class='el-icon-refresh-left'> Refresh</span></el-button>
     <el-button size="mini" type="primary" @click="handleAdd()"><span class='el-icon-document-add'> Addnew</span></el-button>
-
     <el-table :data="tableData.filter(data => !search || data.supplier_name.toLowerCase().includes(search.toLowerCase()))"
       style="width: 99%">
       <el-table-column v-for="col in columns"  :label="col.label" :prop="col.field" 

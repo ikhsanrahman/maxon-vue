@@ -4,7 +4,7 @@
       <el-col :span="4" style="background: black;">
         <MainMenu/>
       </el-col>
-      <el-col :span="19">
+      <el-col :span="20">
         <el-header>
           <div style="padding-left:20px">
             <span v-on:click="collapseSidebar()">
@@ -12,7 +12,6 @@
             </span>
             <h2><span class='el-icon-folder-opened'> MaxonErp</span></h2>
             <h5>Software Bisnis</h5>
-            <p>{{message}}</p>
           </div>           
         </el-header>
 
@@ -31,6 +30,19 @@
   export default {
     components:{
       MainMenu
+    },
+    methods: {
+      selected(){
+          console.log('DialogItem.selected')
+      },
+      handleClose(){
+          console.log('DialogItem.handleClose')
+      },
+      selectItem(){
+          console.log('DialogItem.selectItem')
+      },
+
+
     }
   };
 </script>
@@ -84,7 +96,15 @@ html {
   background-color: #35495e;
 }
 .el-header {
-  background-color: #409eff;
-  border-bottom: #67c23a 2px solid;
+    color: white;
+    background-color: #000000;
+    border-bottom: #f56c6c 2px solid;
+}
+.el-menu-item a {
+    color: white;
+    text-decoration: none;
+}
+.el-container {
+  min-height: 900px;
 }
 </style>

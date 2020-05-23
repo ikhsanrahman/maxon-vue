@@ -48,90 +48,41 @@
 
       <el-divider></el-divider>
       <el-table style="width: 100%" :data="tableData">
-        <el-table-column label="Kode Barang" prop="item_number">
-              <template slot-scope="scope" >
-                  <el-input size="small" style="text-align:center"  v-model="scope.row.item_number"  />
-              </template>
+        <el-table-column v-for="col in columns"  :label="col.label" :prop="col.field" 
+            v-bind:key="col"  v-model="tableColumn">
         </el-table-column>
-        <el-table-column label="Nama Barang" prop="description">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:center"  v-model="scope.row.description"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Quantity" prop="quantity" width="100px">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:center"  v-model="scope.row.quantity"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Satuan" prop="unit" width="100px">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:center"  v-model="scope.row.unit"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Harga" prop="price" width="120px">
-              <template slot-scope="scope" >
-                <el-input size="small" style="text-align:right"  v-model="scope.row.price"  />
-              </template>
-        </el-table-column>
-        <el-table-column label="Jumlah" prop="amount" width="120px">
-              <template slot-scope="scope" style="text-align:right" >
-                <el-input size="small" style="text-align:right"  v-model="scope.row.amount"  />
-              </template>
-        </el-table-column>
-        <el-table-column>
+        <el-table-column width="65">
           <template slot-scope="scope">
-            <el-button @click.native.prevent="saveRow(scope.$index, scope.row)" size="mini" type="primary" >Save</el-button>
-            <el-button @click="deleteRow(scope.$index, scope.row)"  size="mini"  type="danger" >Delete</el-button>
+            <el-button @click.native.prevent="editRow(scope.$index, scope.row)" size="mini" type="primary" >Edit</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column width="65">
+          <template slot-scope="scope">
+            <el-button @click="deleteRow(scope.$index, scope.row)"  size="mini"  type="danger" >Del</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-row>
-    <el-dialog title="Line Items"  :visible.sync="dialogVisible"
-      width="60%" :before-close="handleClose">
-      <el-divider></el-divider>
-      <el-form ref="form" :model="form" label-width="120px">
-          <el-form-item label="Item Number">
-              <el-input v-model="form_item.item_number"></el-input>
-          </el-form-item>
-          <el-form-item label="Description">
-              <el-input v-model="form_item.description"></el-input>
-          </el-form-item>                  
-          <el-form-item label="Quantity">
-              <el-input v-model="form_item.quantity"></el-input>
-          </el-form-item>
-          <el-form-item label="Unit">
-              <el-input v-model="form_item.unit"></el-input>
-          </el-form-item>
-          <el-form-item label="Price">
-              <el-input v-model="form_item.price"></el-input>
-          </el-form-item>
-          <el-form-item label="Discount%">
-              <el-input v-model="form_item.discount"></el-input>
-          </el-form-item>
-          <el-form-item label="Amount">
-              <el-input v-model="form_item.amount"></el-input>
-          </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="onSubmit">Confirm</el-button>
-      </span>
-    </el-dialog>
+    <DialogItem ref="dlgItemInput" 
+      :afterSubmit="this.loadItems"
+      url_save="/api/sales_order/save_item"      
+      primary_key="sales_order_number"
+      ></DialogItem>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+    import DialogItem from "~/components/DialogItem.vue";
+
   export default {
-    components: {
-    },
+    components: {DialogItem},
     head: {
       title: 'Sales Order View'
     },
     data(){
       return {
         message:'',
-        dialogVisible:false,
         tableData: [{item_number: 'Loading...'}],
         form: {
           sales_order_number: this.$route.params.id,
@@ -141,16 +92,6 @@
           payment_terms: 'KREDIT',
           comments: '',
         },
-        form_item: {
-          item_number:'',
-          description:'',
-          quantity:'',
-          unit:'',
-          price:'',
-          discount:'',
-          amount:'',
-          line_number:'',
-        },
         columns: [
           {label: "Item Number", field:"item_number"},
           {label: "Description", field:"description"},
@@ -159,9 +100,10 @@
           {label: "Price", field:"price"},
           {label: "Disc%", field:"discount"},
           {label: "Jumlah", field:"amount"},
-          {label: "Line", field:"line_number"},
         ],
         addCount: 0,
+        listItems: [],
+        item_search: '',
 
       }  
     },
@@ -173,18 +115,23 @@
       saveDoc() {
         const formData = new FormData()
         Object.keys(this.form).forEach((key) => {
-           formData.append(key, this.form[key])
+            if(key=="po_date"){
+            formData.append(key, formatDate(this.form[key]))
+
+            } else {
+            formData.append(key, this.form[key])
+
+            }
         })
         formData.append("mode",this.mode);
 
         var vUrl='/api/sales_order/save';
-
+        this.message="Saving..."
         axios.post(vUrl,formData)
             .then((Response) => {
               console.log(Response);
               if(Response.data.success){
-                this.message="Success";
-                alert("Data sudah disimpan");
+                this.message="Ready";
               } else {
                 this.message=Response.data.msg;
               }
@@ -199,9 +146,10 @@
 
       },
       deleteDoc() {
-        this.$confirm('Are you sure delete this document ?')
+        this.$confirm('Are you sure delete?')
           .then(_ => {
           var vUrl='/api/sales_order/delete/'+this.form.sales_order_number;
+          this.message="Delete...please wait !"
           axios.get(vUrl)
             .then((Response) => {
                 this.message=Response.data.msg;
@@ -215,6 +163,7 @@
       },
       getData(){
         var vUrl='/api/sales_order/view/'+this.form.sales_order_number+"?json=true";
+        this.message="Loading...please wait !"
         axios.get(vUrl)
         .then((Response) => {
             this.form.sales_order_number = Response.data.sales_order_number;
@@ -223,6 +172,7 @@
             this.form.payment_terms=Response.data.payment_terms;
             this.form.salesman=Response.data.salesman;
             this.form.comments=Response.data.comments;
+            this.message="Ready"
         })
         .catch((err) => {
             this.message=err;
@@ -235,7 +185,7 @@
         console.log(key, keyPath);
       },            
       loadItems(){
-        this.message="Loading...";
+        this.message="Loading...please wait !";
         var vUrl='/api/sales_order/items/'+this.form.sales_order_number+"?json=true";
         axios.get(vUrl)
           .then((Response) => {
@@ -247,9 +197,35 @@
           })        
       },
       addRow:function(){
-        let newRow  = {label:"",prop:""};
-        this.tableData = [newRow,...this.tableData];
-        ++ this.addCount;
+        var dlg = this.$refs.dlgItemInput
+        dlg.nomor_bukti=this.form.sales_order_number
+        dlg.item.item_number=""
+        dlg.item.description=""
+        dlg.item.quantity=""
+        dlg.item.unit=""
+        dlg.item.price=""
+        dlg.item.discount=""
+        dlg.item.amount=""
+        dlg.item.line_number=""
+
+        this.dialogVisible=true;
+        dlg.showDialog()
+      },
+      editRow(index,row){
+        var dlg = this.$refs.dlgItemInput
+        dlg.nomor_bukti=this.form.sales_order_number
+        dlg.item.item_number=row.item_number
+        dlg.item.description=row.description
+        dlg.item.quantity=row.quantity
+        dlg.item.unit=row.unit
+        dlg.item.price=row.price 
+        dlg.item.discount=row.discount
+        //dlg.item.total_price=row.amounttotal_price
+        dlg.item.line_number=row.line_number
+
+        this.dialogVisible=true
+        dlg.showDialog()
+
       },
       saveRow(index, rows) { 
         var vUrl='/api/sales_order/save_item';
@@ -268,20 +244,21 @@
           formData.append("mode","add");
         } 
 
-        this.message="Saving...";
+        this.message="Saving...please wait !";
         axios.post(vUrl,formData)
           .then((Response) => {              
               this.loadItems();
-              this.message="Data sudah tersimpan."  ;
+              this.message="Ready"  ;
           })
           .catch((err) => {
               this.message=err;
           })
       },
       deleteRow(index, row) {
-        this.$confirm('Are you sure delete this supplier ?')
+        this.$confirm('Are you sure delete ?')
           .then(_ => {
           var vUrl='/api/sales_order/delete_item/'+this.tableData[index].line_number;
+          this.message="Execute...please wait!"
           axios.get(vUrl)
             .then((Response) => {
                 this.message=Response.data.msg;

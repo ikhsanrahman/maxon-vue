@@ -122,13 +122,12 @@
         formData.append("mode",this.mode);
 
         var vUrl='/api/purchase_order/save';
-
+        this.message="Saving..."
         axios.post(vUrl,formData)
             .then((Response) => {
               console.log(Response);
               if(Response.data.success){
-                this.message="Success";
-                alert("Data sudah disimpan");
+                this.message="Success. Data sudah tersimpan.";
               } else {
                 this.message=Response.data.msg;
               }
@@ -146,6 +145,7 @@
         this.$confirm('Are you sure delete this document ?')
           .then(_ => {
           var vUrl='/api/purchase_order/delete/'+this.form.purchase_order_number;
+          this.message="Delete...please wait !"
           axios.get(vUrl)
             .then((Response) => {
                 this.message=Response.data.msg;
@@ -159,6 +159,7 @@
       },
       getData(){
         var vUrl='/api/purchase_order/view/'+this.form.purchase_order_number+"?json=true";
+        this.message="Loading...please wait !"
         axios.get(vUrl)
         .then((Response) => {
             this.form.purchase_order_number = Response.data.purchase_order_number;
@@ -166,6 +167,7 @@
             this.form.supplier_number=Response.data.supplier_number;
             this.form.terms=Response.data.terms;
             this.form.comments=Response.data.comments;
+            this.message="Ready"
         })
         .catch((err) => {
             this.message=err;
@@ -243,11 +245,11 @@
           formData.append("mode","add");
         } 
 
-        this.message="Saving...";
+        this.message="Saving...please wait!";
         axios.post(vUrl,formData)
           .then((Response) => {              
               this.loadItems();
-              this.message="Data sudah tersimpan."  ;
+              this.message="Ready"  ;
           })
           .catch((err) => {
               this.message=err;
@@ -256,6 +258,7 @@
       deleteRow(index, row) {
         this.$confirm('Are you sure ?')
           .then(_ => {
+            this.message="Processing...please wait!"
           var vUrl='/api/purchase_order/delete_item/'+this.tableData[index].line_number;
           axios.get(vUrl)
             .then((Response) => {
@@ -268,38 +271,6 @@
         })
         .catch(_ => {});
       },
-      querySearchItem(queryString, cb) {
-        this.item_search=queryString 
-        var links = this.listItems;
-        var results = queryString ? links.filter(this.createFilter(queryString)) : links;
-        // call callback function to return suggestions
-        cb(results);
-      },
-      createFilter(queryString) {
-        return (link) => {
-          return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-        };
-      },
-      loadItemPilih() {
-        var vUrl='/api/inventory/browse_data/?tb_search='+this.item_search;
-        axios.get(vUrl)
-          .then((Response) => {
-              this.message=Response.data.msg;
-              var rows=Response.data.rows;
-              for(var i=0;i<rows.length;i++){
-                this.listItems.push({"value":rows[i].description,"link":rows[i].item_number});
-              }
-              console.log(this.listItems)
-          })
-          .catch((err) => {
-              this.message=err;
-          })
-
-      },
-      handleSelectItem(item) {
-        console.log(item);
-      }
-
     },
   }
 

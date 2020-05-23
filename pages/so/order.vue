@@ -116,6 +116,7 @@
         this.$confirm('Are you sure delete this document ?')
           .then(_ => {
           var vUrl='/api/sales_order/delete/'+this.tableData[index].sales_order_number;
+          this.message="Execute...please wait!"        
           axios.get(vUrl)
             .then((Response) => {
                 this.message=Response.data.msg;
@@ -136,10 +137,12 @@
         done();
       },
       loadData(){
+        this.message="Execute...please wait!"        
         var vUrl='/api/sales_order/browse_data/'+this.page+"?sid_date_from="+this.date1+"&sid_date_to="+this.date2;
         axios.get(vUrl)
             .then((Response) => {
                 this.tableData = Response.data.rows;
+                this.message="Ready"
             })
             .catch((err) => {
                 console.log("Error")
@@ -159,7 +162,7 @@
         formData.append("mode",this.mode);
 
         var vUrl='/api/sales_order/save';
-
+        this.message="Execute...please wait!"        
         axios.post(vUrl,formData)
             .then((Response) => {
               console.log(Response);

@@ -54,7 +54,6 @@ export default {
     name:"DialogItem",
     created() {
       console.log('dialogItem.created')  
-      //this.dialogVisible=true
     },
     props: {
         selected: {
@@ -62,6 +61,8 @@ export default {
             default: null
         },
         afterSubmit:null,
+        url_save:'',
+        primary_key:'',
     },
     components: {
         LookupData
@@ -99,10 +100,17 @@ export default {
         Object.keys(this.item).forEach((key) => {
             formData.append(key, this.item[key])
         })
-        formData.append("purchase_order_number",this.nomor_bukti)
+        var fieldKey="purchase_order_number"
+        if(this.primary_key){
+          fieldKey=this.primary_key
+        }
+        formData.append(fieldKey,this.nomor_bukti)
         formData.append("mode",this.mode);
 
-        var vUrl='/api/purchase_order/save_item';
+        var vUrl=vUrl='/api/purchase_order/save_item';
+        if (this.url_save){
+          vUrl=this.url_save
+        } 
 
         axios.post(vUrl,formData)
             .then((Response) => {

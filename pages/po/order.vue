@@ -128,11 +128,13 @@
       handleDelete(index, row) {
         this.$confirm('Are you sure delete this supplier ?')
           .then(_ => {
+          this.message="Execute...please wait!"        
           var vUrl='/api/purchase_order/delete/'+this.tableData[index].purchase_order_number;
           axios.get(vUrl)
             .then((Response) => {
                 this.message=Response.data.msg;
                 this.loadData();
+                this.message="Ready"
             })
             .catch((err) => {
                 console.log(err)
@@ -153,7 +155,7 @@
           .catch(_ => {});
       },
       loadData(){
-        this.message="Loading..."
+        this.message="Execute...please wait!"        
         var vUrl='/api/purchase_order/browse_data/'+this.page+"?sid_date_from="+this.date1+"&sid_date_to="+this.date2;
         axios.get(vUrl)
             .then((Response) => {
@@ -165,7 +167,7 @@
             })
       },
       onSubmit() {
-        this.message="Saving..."
+        this.message="Execute...please wait!"        
         const formData = new FormData()
         Object.keys(this.form).forEach((key) => {
           if(key=="po_date"){
@@ -182,7 +184,7 @@
             .then((Response) => {
                 if(Response.data.success){
                   this.dialogVisible=false;
-                  this.message="Success.";
+                  this.message="Ready";
                   this.form.purchase_order_number=Response.data.purchase_order_number;
                   vUrl="/po/view/"+Response.data.purchase_order_number;
                   window.open(vUrl,"_self");
@@ -204,12 +206,12 @@
           this.loadData();
         },
         SupplierListLoad(){
-          this.message="Loading supplier..."
+          this.message="Execute...please wait!"        
           var vUrl='/api/supplier/browse_data/1/1000';
           axios.get(vUrl)
               .then((Response) => {
                   this.SupplierList = Response.data.rows;
-                  this.message='Ready.'
+                  this.message='Ready'
               })
               .catch((err) => {
                   console.log("Error")

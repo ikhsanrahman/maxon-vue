@@ -4,7 +4,7 @@
       width="60%" :before-close="handleClose">
 
       <span slot="footer" class="dialog-footer">
-         <span style='color:red'><i>{{message}}</i></span>    
+         <span style='color:red '  ><i>{{message}}</i></span>    
         <el-button @click="dialogVisible = false" size="mini">Cancel</el-button>
         <el-button type="primary" @click="onSubmit" size="mini">Confirm</el-button>
       </span>
@@ -34,10 +34,6 @@
             <el-form-item label="Discount%">
                 <el-input v-model="item.discount" ></el-input>
             </el-form-item>
-            <el-form-item label="Amount">
-                <el-input v-model="item.total_price" ></el-input>
-            </el-form-item>
-
           </el-col>
       </el-form>
       </el-row>
@@ -98,7 +94,7 @@ export default {
       },
       onSubmit(){
         console.log('DialogItem.onSubmit')
-        this.message="Saving..apabila success silahkan klik tombol refresh."
+        this.message="Saving..."
         const formData = new FormData()
         Object.keys(this.item).forEach((key) => {
             formData.append(key, this.item[key])

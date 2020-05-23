@@ -19,5 +19,8 @@ $ yarn start
 $ yarn generate
 ```
 
+# demo website
+https://maxon-vue.herokuapp.com/
+
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
 "# maxon-vue" 

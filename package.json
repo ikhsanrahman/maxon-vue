@@ -5,9 +5,9 @@
   "author": "andri",
   "private": true,
   "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start",
+    "dev": "cross-env NUXT_HOST=0.0.0.0 nuxt",
+    "build": "cross-env NUXT_HOST=0.0.0.0 nuxt build",
+    "start": "cross-env NUXT_HOST=0.0.0.0 nuxt start",
     "generate": "nuxt generate"
   },
   "dependencies": {
@@ -16,5 +16,7 @@
     "element-ui": "^2.4.11",
     "nuxt": "^2.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "cross-env": "^7.0.2"
+  }
 }
